@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Upload, User } from "lucide-react";
 import { ProfileData } from "./ProfileForm";
 
 const ProfileDisplay = () => {
+  const navigate = useNavigate();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const { toast } = useToast();
@@ -35,19 +39,36 @@ const ProfileDisplay = () => {
     });
   };
 
+  const handleSubmit = () => {
+    toast({
+      title: "Success",
+      description: "Profile submitted successfully",
+    });
+    navigate("/dashboard");
+  };
+
   if (!profileData) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl space-y-8 slide-up">
+      <div className="w-full max-w-2xl space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">Your Profile</h2>
           <p className="mt-2 text-gray-600">Review your professional details</p>
         </div>
 
         <div className="bg-white shadow rounded-lg p-6 space-y-6">
+          <div className="flex justify-center">
+            <Avatar className="h-32 w-32">
+              <AvatarImage src={profileData.photoUrl} />
+              <AvatarFallback className="bg-gray-100">
+                <User className="h-12 w-12 text-gray-400" />
+              </AvatarFallback>
+            </Avatar>
+          </div>
+
           <div>
             <h3 className="text-lg font-medium text-gray-900">Full Name</h3>
             <p className="mt-1 text-gray-600">{profileData.name}</p>
@@ -90,6 +111,10 @@ const ProfileDisplay = () => {
               onChange={handleFileUpload}
               className="hidden"
             />
+          </div>
+
+          <div className="pt-6 flex justify-center">
+            <Button onClick={handleSubmit}>Submit</Button>
           </div>
         </div>
       </div>

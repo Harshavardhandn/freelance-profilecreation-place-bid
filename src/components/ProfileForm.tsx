@@ -5,12 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Upload } from "lucide-react";
 
 export interface ProfileData {
   name: string;
   skills: string;
   experience: string;
   availability: string;
+  photoUrl?: string;
 }
 
 const ProfileForm = () => {
@@ -22,6 +25,29 @@ const ProfileForm = () => {
     experience: "",
     availability: "",
   });
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Error",
+        description: "Please upload an image file",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setPhotoPreview(base64String);
+      setFormData(prev => ({ ...prev, photoUrl: base64String }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,13 +69,36 @@ const ProfileForm = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8 slide-up">
+      <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">Create Your Profile</h2>
           <p className="mt-2 text-gray-600">Fill in your professional details</p>
         </div>
         
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="flex flex-col items-center space-y-4">
+            <Avatar className="h-24 w-24">
+              <AvatarImage src={photoPreview || ""} />
+              <AvatarFallback className="bg-gray-100">
+                <Upload className="h-8 w-8 text-gray-400" />
+              </AvatarFallback>
+            </Avatar>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => document.getElementById('photo-upload')?.click()}
+            >
+              Upload Photo
+            </Button>
+            <input
+              id="photo-upload"
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoUpload}
+              className="hidden"
+            />
+          </div>
+
           <div className="space-y-4">
             <div>
               <Label htmlFor="name">Full Name</Label>
