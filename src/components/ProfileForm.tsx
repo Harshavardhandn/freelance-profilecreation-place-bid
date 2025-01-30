@@ -7,6 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Upload } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export interface ProfileData {
   name: string;
@@ -67,6 +74,11 @@ const ProfileForm = () => {
     navigate("/profile");
   };
 
+  const handleSkillsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const skills = e.target.value.split(',').map(skill => skill.trim()).filter(Boolean).join(', ');
+    setFormData({ ...formData, skills });
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
@@ -113,14 +125,17 @@ const ProfileForm = () => {
             </div>
 
             <div>
-              <Label htmlFor="skills">Skills</Label>
+              <Label htmlFor="skills">Skills (comma-separated)</Label>
               <Textarea
                 id="skills"
                 value={formData.skills}
-                onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                onChange={handleSkillsChange}
                 className="mt-1"
                 placeholder="React, Node.js, TypeScript..."
               />
+              <p className="text-sm text-gray-500 mt-1">
+                Enter your skills separated by commas
+              </p>
             </div>
 
             <div>
@@ -136,14 +151,20 @@ const ProfileForm = () => {
 
             <div>
               <Label htmlFor="availability">Availability</Label>
-              <Input
-                id="availability"
-                type="text"
+              <Select
                 value={formData.availability}
-                onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
-                className="mt-1"
-                placeholder="Full-time, Part-time, etc."
-              />
+                onValueChange={(value) => setFormData({ ...formData, availability: value })}
+              >
+                <SelectTrigger className="w-full mt-1">
+                  <SelectValue placeholder="Select availability" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="full-time">Full Time</SelectItem>
+                  <SelectItem value="part-time">Part Time</SelectItem>
+                  <SelectItem value="contract">Contract</SelectItem>
+                  <SelectItem value="freelance">Freelance</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
